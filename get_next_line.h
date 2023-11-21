@@ -6,7 +6,7 @@
 /*   By: lpetit <lpetit@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/01 20:17:04 by lpetit            #+#    #+#             */
-/*   Updated: 2023/11/04 14:46:22 by lpetit           ###   ########.fr       */
+/*   Updated: 2023/11/21 09:46:34 by lpetit           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,14 @@
 # endif
 
 # include <stdlib.h>
+# include <stddef.h>
 # include <unistd.h>
 
 char	*get_next_line(int fd);
 char	*ft_strjoin(char const *s1, char const *s2);
-void	*ft_calloc(size_t nmemb, size_t size);
+char	*ft_strdup(char const *s);
+char	*ft_substr(char const *s, unsigned int start, size_t len);
 size_t	ft_strlen(char const *str);
-int		ft_strchr(char const *str, int c);
+char	*ft_strchr(char const *str, int c);
 
 #endif

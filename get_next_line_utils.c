@@ -6,11 +6,11 @@
 /*   By: lpetit <lpetit@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/01 19:39:04 by lpetit            #+#    #+#             */
-/*   Updated: 2023/11/04 14:00:58 by lpetit           ###   ########.fr       */
+/*   Updated: 2023/11/21 09:19:59 by lpetit           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
-#include <stddef.h>
-#include <stdlib.h>
+
+#include "get_next_line.h"
 
 size_t	ft_strlen(char const *str)
 {
@@ -37,40 +37,46 @@ char	*ft_strchr(char const *s, int c)
 	return (NULL);
 }
 
-static void	ft_bzero(void *s, size_t n)
+char	*ft_strdup(char const *s)
 {
-	unsigned char	*s_byte;
+	char	*dest;
+	size_t	i;
 
-	s_byte = (unsigned char *)s;
-	while (n > 0)
-	{
-		*s_byte++ = 0;
-		n--;
-	}
-	return ;
-}
-
-void	*ft_calloc(size_t nmemb, size_t size)
-{
-	void	*dest;
-	size_t	limit;
-
-	dest = NULL;
-	limit = nmemb * size;
-	if (limit != 0 && size != 0)
-	{
-		if (limit / size != nmemb)
-		{
-			return (NULL);
-		}
-	}
-	if (nmemb == 0 || size == 0)
-		limit = 0;
-	dest = (void *)malloc(limit);
+	i = 0;
+	dest = (char *)malloc((ft_strlen(s) + 1) * sizeof(char));
 	if (!dest)
 		return (NULL);
-	ft_bzero(dest, nmemb * size);
+	while (s[i])
+	{
+		dest[i] = s[i];
+		i++;
+	}
+	dest[i] = '\0';
 	return (dest);
+}
+
+char	*ft_substr(char const *s, unsigned int start, size_t len)
+{
+	char	*substr;
+	size_t	i;
+
+	if (!s)
+		return (NULL);
+	if (ft_strlen(s) < start)
+		return (ft_strdup(""));
+	i = 0;
+	if (len > ft_strlen(s + start))
+		len = ft_strlen(s + start);
+	substr = (char *)malloc((len + 1) * sizeof(char));
+	if (!substr)
+		return (NULL);
+	while (len != 0 && s[start])
+	{
+		substr[i++] = s[start++];
+		len--;
+	}
+	substr[i] = '\0';
+	return (substr);
 }
 
 char	*ft_strjoin(char const *s1, char const *s2)

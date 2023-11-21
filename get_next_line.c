@@ -6,119 +6,83 @@
 /*   By: lpetit <lpetit@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/01 16:30:29 by lpetit            #+#    #+#             */
-/*   Updated: 2023/11/04 15:30:08 by lpetit           ###   ########.fr       */
+/*   Updated: 2023/11/21 12:30:11 by lpetit           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
+
 #include "get_next_line.h"
-#include <stdio.h>
 
-char	*ft_join_buffer(char *static_buf, char *buffer)
+char	*ft_saved(char *line)
 {
-	char	*joined_buf;
-
-	joined_buf = ft_strjoin(static_buf, buffer);
-	free(static_buf);
-	return (joined_buf);
-}
-
-char	*ft_next_line(char *buffer)
-{
-	char	*next;
 	size_t	i;
-	size_t	j;
+	char	*saved;
 
 	i = 0;
-	j = 0;
-	while (buffer[i] && buffer[i] != '\n')
+	while (line[i] != '\n' && line[i] != '\0')
 		i++;
-	if (buffer[i] == '\0')
-	{
-		free(buffer);
+	if (line[i] == '\0')
 		return (NULL);
-	}
-	next = ft_calloc((ft_strlen(buffer) - i + 1), sizeof(char));
-	if (!next)
-	{
-		free(buffer);
+	saved = ft_substr(line, i + 1, ft_strlen(line) - i);
+	if (!saved)
 		return (NULL);
+	if (*saved == '\0')
+	{
+		free(saved);
+		saved = NULL;
 	}
-	i++;
-	while (buffer[i])
-		next[j++] = buffer[i++];
-	free(buffer);
-	next[j] = '\0';
-	return (next);
+	line[i + 1] = '\0';
+	return (saved);
 }
 
-char	*ft_line(char *buffer)
+char	*ft_read_line(int fd, char *static_buf, char *buf)
 {
-	char	*line;
-	size_t	i;
-
-	i = 0;
-	if (buffer[i] == '\0')
-		return (NULL);
-	while (buffer[i] && buffer[i] != '\n')
-		i++;
-	line = ft_calloc((i + 2), sizeof(char));
-	if (!line)
-	{
-		free(buffer);
-		return (NULL);
-	}
-	i = 0;
-	while (buffer[i] && buffer[i] != '\n')
-	{
-		line[i] = buffer[i];
-		i++;
-	}
-	if (buffer[i] && buffer[i] == '\n')
-	{
-		line[i++] = '\n';
-	}
-	return (line);
-}
-
-char	*ft_read_file(int fd, char *static_buf)
-{
-	char	*buffer;
+	char	*tmp;
 	ssize_t	n;
 
-	if (!static_buf)
-		static_buf = calloc(1, 1);
-	buffer = ft_calloc((BUFFER_SIZE + 1), sizeof(char));
-	if (!buffer)
-		return (NULL);
 	n = 1;
 	while (n > 0)
 	{
-		n = read(fd, buffer, BUFFER_SIZE);
+		n = read(fd, buf, BUFFER_SIZE);
 		if (n == -1)
-		{
-			free(buffer);
 			return (NULL);
-		}
-		buffer[n] = '\0';
-		static_buf = ft_join_buffer(static_buf, buffer);
-		if (ft_strchr(buffer, '\n'))
+		else if (n == 0)
+			break ;
+		buf[n] = '\0';
+		if (!static_buf)
+			static_buf = ft_strdup("");
+		tmp = static_buf;
+		static_buf = ft_strjoin(tmp, buf);
+		free(tmp);
+		tmp = NULL;
+		if (!static_buf)
+			return (NULL);
+		if (ft_strchr(buf, '\n'))
 			break ;
 	}
-	free(buffer);
 	return (static_buf);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*static_buf;
+	char		*buf;
 	char		*line;
+	static char	*static_buf;
 
-	if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, 0, 0) < 0)
+	if (read(fd, 0, 0) < 0 || BUFFER_SIZE == 0 || BUFFER_SIZE >= 2147483647)
 		return (NULL);
-	static_buf = ft_read_file(fd, static_buf);
-	if (!static_buf)
+	buf = (char *)malloc((BUFFER_SIZE + 1) * sizeof(char));
+	if (!buf)
+	{
+		free(static_buf);
+		static_buf = NULL;
 		return (NULL);
-	line = ft_line(static_buf);
-	static_buf = ft_next_line(static_buf);
+	}
+	line = ft_read_line(fd, static_buf, buf);
+	free(buf);
+	buf = NULL;
+	if (!line)
+		return (NULL);
+	static_buf = ft_saved(line);
 	return (line);
 }
 /*
@@ -137,8 +101,8 @@ int	main(void)
 	{
 		printf("%s", buffer);
 		printf("--------------\n");
+		free(buffer);
 		buffer = get_next_line(fd);
 	}
 	close(fd);
-	free(buffer);
 }*/
