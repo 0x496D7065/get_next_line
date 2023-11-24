@@ -6,11 +6,21 @@
 /*   By: lpetit <lpetit@student.s19.be>             +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/01 16:30:29 by lpetit            #+#    #+#             */
-/*   Updated: 2023/11/21 12:30:11 by lpetit           ###   ########.fr       */
+/*   Updated: 2023/11/23 10:57:02 by lpetit           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
+
+char	*ft_fix_line(char *line)
+{
+	char	*tmp;
+
+	tmp = line;
+	line = ft_strdup(tmp);
+	free(tmp);
+	return (line);
+}
 
 char	*ft_saved(char *line)
 {
@@ -69,7 +79,11 @@ char	*get_next_line(int fd)
 	static char	*static_buf;
 
 	if (read(fd, 0, 0) < 0 || BUFFER_SIZE == 0 || BUFFER_SIZE >= 2147483647)
+	{
+		free(static_buf);
+		static_buf = NULL;
 		return (NULL);
+	}
 	buf = (char *)malloc((BUFFER_SIZE + 1) * sizeof(char));
 	if (!buf)
 	{
@@ -83,6 +97,7 @@ char	*get_next_line(int fd)
 	if (!line)
 		return (NULL);
 	static_buf = ft_saved(line);
+	line = ft_fix_line(line);
 	return (line);
 }
 /*
